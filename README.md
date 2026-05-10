@@ -90,7 +90,7 @@ Para que el framework funcione a su máxima capacidad:
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/sudo-bautista-johansson/Ethical-Hacking-Tooling.git
+git clone https://github.com/TuUsuario/Farei_0x.git
 cd Farei_0x
 # Ver comandos disponibles
 python3 Farei_0x.py -h

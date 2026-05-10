@@ -4,7 +4,7 @@ import os
 DB_NAME = "bauty_state.db"
 
 def init_db():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     
     # Tablas Originales
@@ -21,14 +21,14 @@ def init_db():
     conn.close()
 
 def add_host(ip):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     c.execute('INSERT OR IGNORE INTO hosts (ip) VALUES (?)', (ip,))
     conn.commit()
     conn.close()
 
 def add_port(ip, port, service="unknown"):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     c.execute('SELECT id FROM ports WHERE ip=? AND port=?', (ip, port))
     if not c.fetchone():
@@ -37,7 +37,7 @@ def add_port(ip, port, service="unknown"):
     conn.close()
 
 def add_cred(ip, username, password, cred_type):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     c.execute('INSERT INTO creds (ip, username, password_or_hash, type) VALUES (?, ?, ?, ?)', (ip, username, password, cred_type))
     conn.commit()
@@ -46,7 +46,7 @@ def add_cred(ip, username, password, cred_type):
 # --- Nuevas Funciones de Guardado ---
 
 def add_directory(url, path, size, status):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     c.execute('SELECT id FROM directories WHERE url=? AND path=?', (url, path))
     if not c.fetchone():
@@ -55,7 +55,7 @@ def add_directory(url, path, size, status):
     conn.close()
 
 def add_exploit(service, url_link, description=""):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     c.execute('SELECT id FROM exploits WHERE url=?', (url_link,))
     if not c.fetchone():
@@ -64,7 +64,7 @@ def add_exploit(service, url_link, description=""):
     conn.close()
 
 def add_ad_finding(target, vuln, user):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     c.execute('SELECT id FROM ad_findings WHERE vulnerability=? AND user_account=?', (vuln, user))
     if not c.fetchone():
@@ -74,7 +74,7 @@ def add_ad_finding(target, vuln, user):
 
 def get_all_state():
     """Extrae todo el estado (viejo y nuevo) para el súper-reporte."""
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     c = conn.cursor()
     
     c.execute('SELECT * FROM hosts')

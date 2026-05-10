@@ -64,8 +64,8 @@ def analyze_bloodhound_data(file_path):
 
     except FileNotFoundError:
         print(f"{Colors.FAIL}[-] Error: Archivo {file_path} no encontrado.{Colors.ENDC}")
-    except json.JSONDecodeError:
-        print(f"{Colors.FAIL}[-] Error: El archivo no es un JSON válido o está corrupto.{Colors.ENDC}")
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        print(f"{Colors.FAIL}[-] Error: El archivo no es un texto JSON válido o es un archivo binario corrupto.{Colors.ENDC}")
     except Exception as e:
         print(f"{Colors.FAIL}[-] Error inesperado analizando JSON: {e}{Colors.ENDC}")
 

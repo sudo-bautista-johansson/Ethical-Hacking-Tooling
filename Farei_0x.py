@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import datetime
 import sys
 import os
 from core import db
@@ -20,38 +21,9 @@ def print_banner():
     print("=======================================")
     print(f"{Colors.ENDC}")
 
-def handle_recon(args):
-    print(f"{Colors.OKCYAN}[*] Módulo Recon activado para: {args.ip}{Colors.ENDC}")
-    db.add_host(args.ip)
-    
-    # Aquí en el futuro importaremos modules.recon y ejecutaremos la lógica.
-    # Por ahora simulamos que encontramos un puerto y lo guardamos.
-    print("[*] Ejecutando Nmap (Simulado)...")
-    db.add_port(args.ip, 80, "http")
-    db.add_port(args.ip, 22, "ssh")
-    print(f"{Colors.OKGREEN}[+] Reconocimiento finalizado. Puertos guardados en BD.{Colors.ENDC}")
-
-def handle_fuzz(args):
-    # Si no se provee IP, buscar en BD las IPs que tienen puerto 80/443
-    if not args.ip:
-        state = db.get_all_state()
-        ips_with_web = list(set([p[1] for p in state["ports"] if p[2] in (80, 443, 8080)]))
-        if not ips_with_web:
-            print(f"{Colors.FAIL}[-] No se proveyó IP y no hay servicios web en la base de datos.{Colors.ENDC}")
-            return
-        target_ip = ips_with_web[0]
-        print(f"{Colors.WARNING}[!] Auto-Fuzz: Seleccionando objetivo de la DB -> {target_ip}{Colors.ENDC}")
-    else:
-        target_ip = args.ip
-
-    print(f"{Colors.OKCYAN}[*] Módulo Fuzzer activado para: {target_ip}{Colors.ENDC}")
-    # Aquí llamaremos a modules.fuzzer
-
 def handle_report(args):
     print(f"{Colors.OKCYAN}[*] Generando Súper-Reporte a partir de la Base de Datos...{Colors.ENDC}")
     state = db.get_all_state()
-    
-    import datetime
     report_file = "Bauty_Report.md"
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -112,7 +84,7 @@ def main():
     
     # Comando Fuzz
     parser_fuzz = subparsers.add_parser("fuzz", help="Fuzzing web de directorios")
-    parser_fuzz.add_argument("--ip", help="IP objetivo (opcional si ya se hizo recon)")
+    parser_fuzz.add_argument("ip", nargs="?", help="IP objetivo (opcional si ya se hizo recon)")
     parser_fuzz.add_argument("-w", "--wordlist", default="/usr/share/wordlists/dirb/common.txt")
     
     # Comando Payload
@@ -132,8 +104,8 @@ def main():
 
     # Comando AD (Active Directory)
     parser_ad = subparsers.add_parser("ad", help="Comandos de automatización para Active Directory")
-    parser_ad.add_argument("dc_ip", help="IP del Domain Controller")
-    parser_ad.add_argument("domain", help="Nombre del dominio (ej. corp.local)")
+    parser_ad.add_argument("dc_ip", nargs="?", help="IP del Domain Controller (Requerido si no usas --parse)")
+    parser_ad.add_argument("domain", nargs="?", help="Nombre del dominio (Requerido si no usas --parse)")
     parser_ad.add_argument("--parse", help="Ruta a un archivo JSON de BloodHound para parsear automáticamente")
 
     # Comando CVE
@@ -174,6 +146,9 @@ def main():
         from modules import hashes
         hashes.run(args.file)
     elif args.command == "ad":
+        if not args.parse and (not args.dc_ip or not args.domain):
+            print(f"{Colors.FAIL}[-] Error: Debes proveer 'dc_ip' y 'domain' si no estás usando '--parse'.{Colors.ENDC}")
+            sys.exit(1)
         from modules import ad
         ad.run(args.dc_ip, args.domain, args.parse)
     elif args.command == "cve":

