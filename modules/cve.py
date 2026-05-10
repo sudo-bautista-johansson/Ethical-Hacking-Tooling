@@ -28,10 +28,12 @@ def run(service_name):
             
             if data['total_count'] > 0:
                 print(f"{Colors.OKGREEN}[+] ¡Repositorios encontrados! Mostrando los 3 más votados:{Colors.ENDC}")
+                from core import db
                 for i, repo in enumerate(data['items'][:3]):
                     print(f"\n    ⭐ Estrellas: {repo['stargazers_count']}")
                     print(f"    🔗 Enlace: {repo['html_url']}")
                     print(f"    💻 Comando: git clone {repo['clone_url']}")
+                    db.add_exploit(service_name, repo['html_url'], f"Estrellas: {repo['stargazers_count']}")
             else:
                 print(f"{Colors.WARNING}[-] GitHub API no arrojó resultados claros de repositorios para este servicio.{Colors.ENDC}")
                 

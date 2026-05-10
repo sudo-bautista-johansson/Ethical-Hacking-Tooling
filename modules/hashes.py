@@ -48,12 +48,14 @@ def run(filepath):
     print(f"\n{Colors.OKGREEN}[+] HASHES ENCONTRADOS:{Colors.ENDC}\n" + "-"*50)
     out_file = "hashes_extraidos.txt"
     try:
+        from core import db
         with open(out_file, 'w', encoding='utf-8') as f_out:
             for user, hash_val in results:
                 tipo, hashcat_mode = identify_hash(hash_val)
                 print(f"Hash: {hash_val[:30]}... | Tipo: {tipo} | Modo: {hashcat_mode}")
                 f_out.write(f"{hash_val}\n")
-        print(f"\n{Colors.OKCYAN}[*] Hashes guardados limpios en '{out_file}'{Colors.ENDC}")
+                db.add_cred(filepath, "ExtractedUser", hash_val, tipo)
+        print(f"\n{Colors.OKCYAN}[*] Hashes guardados limpios en '{out_file}' y en la DB.{Colors.ENDC}")
         modos = set([identify_hash(h)[1] for _, h in results])
         for modo in modos:
             if modo != "?": 

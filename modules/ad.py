@@ -38,11 +38,14 @@ def analyze_bloodhound_data(file_path):
 
         print(f"\n{Colors.BOLD}--- RESULTADOS DEL ANÁLISIS AUTOMÁTICO ---{Colors.ENDC}")
         
+        from core import db
+
         if asrep_vulnerable:
             print(f"\n{Colors.FAIL}[!] VULNERABILIDAD CRÍTICA: AS-REP Roasting Posible{Colors.ENDC}")
             print(f"{Colors.WARNING}Los siguientes usuarios tienen DONT_REQ_PREAUTH habilitado. Puedes obtener su hash sin contraseña.{Colors.ENDC}")
             for u in asrep_vulnerable:
                 print(f"  -> {u}")
+                db.add_ad_finding("Dominio", "AS-REP Roasting", u)
         else:
             print(f"\n{Colors.OKGREEN}[+] No se encontraron usuarios vulnerables a AS-REP.{Colors.ENDC}")
 
@@ -51,11 +54,13 @@ def analyze_bloodhound_data(file_path):
             print(f"{Colors.WARNING}Los siguientes usuarios tienen SPNs. Si consigues una cuenta de bajos privilegios, puedes robar el ticket de estos servicios.{Colors.ENDC}")
             for u in kerberoast_vulnerable:
                 print(f"  -> {u}")
+                db.add_ad_finding("Dominio", "Kerberoasting", u)
                 
         if admins:
             print(f"\n{Colors.OKCYAN}[*] Usuarios marcados con AdminCount=1 (Objetivos de Alto Valor):{Colors.ENDC}")
             for u in admins:
                 print(f"  -> {u}")
+                db.add_ad_finding("Dominio", "Admin Privilegiado", u)
 
     except FileNotFoundError:
         print(f"{Colors.FAIL}[-] Error: Archivo {file_path} no encontrado.{Colors.ENDC}")

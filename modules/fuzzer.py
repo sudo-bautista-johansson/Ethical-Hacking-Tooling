@@ -42,6 +42,9 @@ async def fetch(session, url, path, sem, false_size):
                         if false_size - 10 <= res.content_length <= false_size + 10:
                             return # Ignoramos este resultado, es basura.
 
+                    from core import db
+                    db.add_directory(url, path, res.content_length, res.status)
+
                     color = Colors.OKGREEN if res.status == 200 else Colors.WARNING
                     print(f"{color}[Status: {res.status}]{Colors.ENDC} [Size: {res.content_length}] - {target}")
         except Exception as e:

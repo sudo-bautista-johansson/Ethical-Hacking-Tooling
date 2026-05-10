@@ -48,25 +48,56 @@ def handle_fuzz(args):
     # Aquí llamaremos a modules.fuzzer
 
 def handle_report(args):
-    print(f"{Colors.OKCYAN}[*] Generando reporte a partir de la Base de Datos...{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}[*] Generando Súper-Reporte a partir de la Base de Datos...{Colors.ENDC}")
     state = db.get_all_state()
     
+    import datetime
     report_file = "Bauty_Report.md"
-    with open(report_file, 'w') as f:
-        f.write("# Reporte Final de CTF\n\n")
-        f.write("## 1. Hosts Descubiertos\n")
-        for h in state["hosts"]:
-            f.write(f"- IP: **{h[0]}** (Escaneado el: {h[2]})\n")
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(report_file, 'w', encoding='utf-8') as f:
+        f.write("# 🏴‍☠️ Reporte de Inteligencia CTF - Farei_0x\n")
+        f.write(f"**Generado el:** {current_time}\n")
+        f.write("---\n\n")
+        
+        f.write("## 1. 🖥️ Superficie de Ataque (Hosts)\n")
+        if not state.get("hosts"): f.write("> No se registraron hosts en esta sesión.\n")
+        else:
+            for h in state["hosts"]: f.write(f"- 🟢 **IP:** `{h[0]}` (Fecha: {h[2]})\n")
             
-        f.write("\n## 2. Puertos Abiertos\n")
-        for p in state["ports"]:
-            f.write(f"- IP: {p[1]} | Puerto: **{p[2]}** | Servicio: {p[3]}\n")
+        f.write("\n## 2. 🚪 Vectores de Red (Puertos)\n")
+        if not state.get("ports"): f.write("> No se registraron puertos.\n")
+        else:
+            f.write("| IP | Puerto | Servicio | Estado |\n|---|---|---|---|\n")
+            for p in state["ports"]: f.write(f"| `{p[1]}` | **{p[2]}** | {p[3]} | {p[4]} |\n")
             
-        f.write("\n## 3. Credenciales Extraídas\n")
-        for c in state["creds"]:
-            f.write(f"- IP: {c[1]} | User: {c[2]} | Pass/Hash: `{c[3]}` | Tipo: {c[4]}\n")
+        f.write("\n## 3. 🌐 Mapeo Web (Fuzzing)\n")
+        if not state.get("directories"): f.write("> No se registró fuzzing exitoso.\n")
+        else:
+            f.write("| URL Base | Ruta Descubierta | Tamaño (Bytes) | Status HTTP |\n|---|---|---|---|\n")
+            for d in state["directories"]: f.write(f"| {d[1]} | **/{d[2]}** | {d[3]} | {d[4]} |\n")
+
+        f.write("\n## 4. ☢️ Arsenal y Exploits (CVEs)\n")
+        if not state.get("exploits"): f.write("> No se buscaron exploits en esta sesión.\n")
+        else:
+            f.write("| Servicio Vulnerable | Link del Exploit (GitHub) | Detalles |\n|---|---|---|\n")
+            for e in state["exploits"]: f.write(f"| **{e[1]}** | [Link]({e[2]}) | {e[3]} |\n")
+
+        f.write("\n## 5. 🗝️ Credenciales y Hashes\n")
+        if not state.get("creds"): f.write("> No se extrajeron credenciales.\n")
+        else:
+            f.write("| Origen | Usuario | Credencial/Hash | Tipo |\n|---|---|---|---|\n")
+            for c in state["creds"]: f.write(f"| `{c[1]}` | {c[2]} | `{c[3]}` | {c[4]} |\n")
             
-    print(f"{Colors.OKGREEN}[+] Reporte generado exitosamente en: {report_file}{Colors.ENDC}")
+        f.write("\n## 6. 🏰 Infraestructura Active Directory\n")
+        if not state.get("ad_findings"): f.write("> No se encontraron vulnerabilidades de dominio.\n")
+        else:
+            f.write("| Objetivo | Vulnerabilidad | Cuenta Afectada |\n|---|---|---|\n")
+            for a in state["ad_findings"]: f.write(f"| `{a[1]}` | **{a[2]}** | `{a[3]}` |\n")
+        
+        f.write("\n---\n> Reporte de Inteligencia Total generado automáticamente por Farei_0x Core.\n")
+            
+    print(f"{Colors.OKGREEN}[+] Súper-Reporte generado exitosamente en: {report_file}{Colors.ENDC}")
 
 def main():
     # Inicializar Base de Datos siempre al arrancar
@@ -88,6 +119,8 @@ def main():
     parser_payload = subparsers.add_parser("payload", help="Generador de reverse shells")
     parser_payload.add_argument("ip", help="Tu IP atacante")
     parser_payload.add_argument("port", help="Tu puerto de escucha")
+    parser_payload.add_argument("--base64", action="store_true", help="Codifica la shell en Base64 para evadir WAFs")
+    parser_payload.add_argument("--urlencode", action="store_true", help="Aplica URL-Encode a la shell")
     
     # Comando Crypto
     parser_crypto = subparsers.add_parser("crypto", help="Desencriptador de fuerza bruta criptográfica")
@@ -133,7 +166,7 @@ def main():
         fuzzer.run(url, args.wordlist)
     elif args.command == "payload":
         from modules import payloads
-        payloads.run(args.ip, args.port)
+        payloads.run(args.ip, args.port, use_base64=args.base64, use_urlencode=args.urlencode)
     elif args.command == "crypto":
         from modules import crypto
         crypto.run(args.string)
