@@ -1,0 +1,27 @@
+# Archivo de prueba - Hashes de ejemplo (NO son reales)
+# Formato /etc/shadow
+root:$6$rounds=5000$saltsalt$DgHzP3Oe4.LN/IALKO3G1QG8TqDgGzVJ0wfGlDr4u0R6F5Xq6.CZg1QoBQMJ2v1C2HKnYqS5F3EbR5xyGJya0:19000:0:99999:7:::
+admin:$1$xyz$rfR6.4S7sFHXqqJGLAqmv/:18234:0:99999:7:::
+
+# Hash NTLM puro
+aad3b435b51404eeaad3b435b51404ee
+e19ccf75ee54e06b06a5907af13cef42
+
+# SHA-256
+5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
+
+# SHA-1
+a94a8fe5ccb19ba61c4c0873d391e987982fbbd3
+
+# MySQL Hash
+*6C8989366EAF6BCEE4CE87B72F8C57C9544A57E5
+
+# WordPress / PHPass
+$P$BgS2RkxGJWWM7h2v/0LNWbqQTIBs.R1
+
+# Kerberos AS-REP
+$krb5asrep$23$svc_admin@THM.LOCAL:abc123def456abc123def456abc123de$abc123def456abc123def456abc123def456abc123def456abc123
+
+# Secretsdump format (user:rid:lm:ntlm)
+Administrator:500:aad3b435b51404ee:e19ccf75ee54e06b06a5907af13cef42:::
+Guest:501:aad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
