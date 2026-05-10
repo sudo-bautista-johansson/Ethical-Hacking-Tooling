@@ -139,6 +139,9 @@ def main():
     parser_osint = subparsers.add_parser("osint", help="OSINT pasivo: WHOIS, DNS, subdominios, dorks")
     parser_osint.add_argument("domain", help="Dominio objetivo (ej: target.htb)")
 
+    # Comando AI
+    parser_ai = subparsers.add_parser("ai", help="Asistente interactivo: Chatbot ofensivo con memoria (Obsidian Tier)")
+
     # Comando Report
     subparsers.add_parser("report", help="Genera reporte Markdown completo desde la Base de Datos")
 
@@ -211,6 +214,9 @@ def main():
     elif args.command == "osint":
         from modules import osint
         osint.run(args.domain)
+    elif args.command == "ai":
+        from modules import ai
+        ai.run()
     elif args.command == "report":
         handle_report(args)
     else:

@@ -1,7 +1,7 @@
 # 🦇 Farei_0x — Obsidian Tier CTF Arsenal
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Modules](https://img.shields.io/badge/Modules-14-red)
+![Modules](https://img.shields.io/badge/Modules-15-red)
 ![Tier](https://img.shields.io/badge/Tier-Obsidian-black)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
@@ -25,7 +25,7 @@ Su filosofía es simple: **Velocidad de élite y cero fricción.** Elimina el ti
 2. **Fuzzer Anti-Rabbit-Hole:** Calibra contra páginas falsas antes de atacar. No te perdés en 200 OK que no existen.
 3. **3 Fases de Recon:** Fast Scan → Deep Service Scan → Sugerencias inteligentes según servicios encontrados.
 4. **Auto-Reporte:** Al terminar la máquina, genera `Bauty_Report.md` con todos los hallazgos.
-5. **14 Módulos Obsidian:** De recon hasta post-explotación, todo en un solo framework.
+5. **15 Módulos Obsidian:** De recon hasta IA de combate, todo en un solo framework.
 
 ---
 
@@ -151,6 +151,22 @@ python3 Farei_0x.py encoder "TEXTO" --key CLAVE      # Vigenere
 
 ---
 
+### CEREBRO TÁCTICO (IA)
+
+#### `ai` — Entidad Ofensiva Interactiva
+```bash
+# Exportar primero la API Key de Google Gemini
+$env:GEMINI_API_KEY="TU_API_KEY"  # Windows
+export GEMINI_API_KEY="TU_API_KEY" # Linux
+
+python3 Farei_0x.py ai
+```
+- **Memoria Contextual:** Lee y comprende el estado completo de tu SQLite (`bauty_state.db`).
+- **Auto-Coder:** Te programa exploits personalizados (ej. RCE) sobre la marcha en base a versiones descubiertas.
+- **Modo Chat:** Loop interactivo para guiarte paso a paso durante toda la máquina.
+
+---
+
 ### OTROS
 
 #### `hashes` — Identificador + Extractor (17 tipos)
@@ -194,6 +210,7 @@ python3 Farei_0x.py crypto "VEhNe2ZsYWd9"
 python3 Farei_0x.py encoder "... --- ..."
 python3 Farei_0x.py hashes /etc/shadow
 python3 Farei_0x.py ad 10.10.10.X corp.local
+python3 Farei_0x.py ai
 python3 Farei_0x.py report
 ```
 
