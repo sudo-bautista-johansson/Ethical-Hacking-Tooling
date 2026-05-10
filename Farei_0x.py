@@ -79,28 +79,36 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Comandos disponibles")
     
     # Comando Recon
-    parser_recon = subparsers.add_parser("recon", help="Escaneo inteligente de puertos")
+    parser_recon = subparsers.add_parser("recon", help="Escaneo inteligente de puertos (3 fases)")
     parser_recon.add_argument("ip", help="IP objetivo")
     
     # Comando Fuzz
-    parser_fuzz = subparsers.add_parser("fuzz", help="Fuzzing web de directorios")
+    parser_fuzz = subparsers.add_parser("fuzz", help="Fuzzing web de directorios o VHosts")
     parser_fuzz.add_argument("ip", nargs="?", help="IP objetivo (opcional si ya se hizo recon)")
     parser_fuzz.add_argument("-w", "--wordlist", default="/usr/share/wordlists/dirb/common.txt")
+    parser_fuzz.add_argument("--vhost", action="store_true", help="Modo VHost: fuzzear subdominios via cabecera Host")
+    parser_fuzz.add_argument("--domain", help="Dominio base para VHost fuzzing (ej: target.htb)")
     
     # Comando Payload
-    parser_payload = subparsers.add_parser("payload", help="Generador de reverse shells")
-    parser_payload.add_argument("ip", help="Tu IP atacante")
-    parser_payload.add_argument("port", help="Tu puerto de escucha")
+    parser_payload = subparsers.add_parser("payload", help="Generador de reverse shells + TTY upgrade")
+    parser_payload.add_argument("ip", nargs="?", help="Tu IP atacante")
+    parser_payload.add_argument("port", nargs="?", help="Tu puerto de escucha")
     parser_payload.add_argument("--base64", action="store_true", help="Codifica la shell en Base64 para evadir WAFs")
     parser_payload.add_argument("--urlencode", action="store_true", help="Aplica URL-Encode a la shell")
+    parser_payload.add_argument("--upgrade", action="store_true", help="Muestra pasos para upgrade de shell a TTY completa")
     
     # Comando Crypto
-    parser_crypto = subparsers.add_parser("crypto", help="Desencriptador de fuerza bruta criptográfica")
+    parser_crypto = subparsers.add_parser("crypto", help="Desencriptador: Base64/32/Hex/ROT (recursivo)")
     parser_crypto.add_argument("string", help="Cadena a desencriptar")
 
+    # Comando Encoder
+    parser_encoder = subparsers.add_parser("encoder", help="Cifrados clásicos: Morse, Atbash, Vigenere, Rail Fence")
+    parser_encoder.add_argument("string", help="Cadena a decodificar")
+    parser_encoder.add_argument("--key", help="Clave para Vigenere (opcional)")
+
     # Comando Hashes
-    parser_hashes = subparsers.add_parser("hashes", help="Extractor de hashes desde archivos")
-    parser_hashes.add_argument("file", help="Ruta al archivo (ej. /etc/shadow)")
+    parser_hashes = subparsers.add_parser("hashes", help="Extractor de hashes (17 tipos, incluyendo Kerberos)")
+    parser_hashes.add_argument("file", help="Ruta al archivo (ej. /etc/shadow, secretsdump.txt)")
 
     # Comando AD (Active Directory)
     parser_ad = subparsers.add_parser("ad", help="Comandos de automatización para Active Directory")
@@ -108,12 +116,31 @@ def main():
     parser_ad.add_argument("domain", nargs="?", help="Nombre del dominio (Requerido si no usas --parse)")
     parser_ad.add_argument("--parse", help="Ruta a un archivo JSON de BloodHound para parsear automáticamente")
 
+    # Comando SMB
+    parser_smb = subparsers.add_parser("smb", help="Enumeración completa de SMB (null session + creds)")
+    parser_smb.add_argument("ip", help="IP objetivo")
+    parser_smb.add_argument("-u", "--user", help="Usuario (opcional)", default=None)
+    parser_smb.add_argument("-p", "--password", help="Contraseña (opcional)", default=None)
+
+    # Comando SQLi
+    parser_sqli = subparsers.add_parser("sqli", help="Payloads SQLi + comandos sqlmap")
+    parser_sqli.add_argument("--url", help="URL objetivo (ej: http://10.10.10.X/page?id=1)", default=None)
+
+    # Comando PrivEsc
+    parser_privesc = subparsers.add_parser("privesc", help="Vectores de escalada de privilegios Linux/Windows")
+    parser_privesc.add_argument("--os", choices=["linux", "windows"], default="linux",
+                                help="Sistema operativo objetivo (default: linux)")
+
     # Comando CVE
-    parser_cve = subparsers.add_parser("cve", help="Auto-búsqueda de exploits y CVEs")
-    parser_cve.add_argument("service", help="Nombre del servicio y versión (ej. 'Apache 2.4.49')")
+    parser_cve = subparsers.add_parser("cve", help="Auto-búsqueda de exploits y CVEs (NVD + GitHub)")
+    parser_cve.add_argument("service", help="Nombre del servicio o CVE-ID (ej. 'Apache 2.4.49' o 'CVE-2021-41773')")
+
+    # Comando OSINT
+    parser_osint = subparsers.add_parser("osint", help="OSINT pasivo: WHOIS, DNS, subdominios, dorks")
+    parser_osint.add_argument("domain", help="Dominio objetivo (ej: target.htb)")
 
     # Comando Report
-    parser_report = subparsers.add_parser("report", help="Genera reporte en Markdown desde la BD")
+    subparsers.add_parser("report", help="Genera reporte Markdown completo desde la Base de Datos")
 
     args = parser.parse_args()
 
@@ -135,13 +162,31 @@ def main():
                 print(f"{Colors.FAIL}[-] No se proveyó IP y no hay servicios web en DB.{Colors.ENDC}")
                 sys.exit(1)
         url = f"http://{target_ip}"
-        fuzzer.run(url, args.wordlist)
+        if args.vhost:
+            if not args.domain:
+                print(f"{Colors.FAIL}[-] El modo --vhost requiere especificar --domain (ej: --domain target.htb){Colors.ENDC}")
+                sys.exit(1)
+            fuzzer.run(url, args.wordlist, mode="vhost", domain=args.domain)
+        else:
+            fuzzer.run(url, args.wordlist, mode="dir")
     elif args.command == "payload":
-        from modules import payloads
-        payloads.run(args.ip, args.port, use_base64=args.base64, use_urlencode=args.urlencode)
+        if args.upgrade:
+            from modules import shell_upgrade
+            ip = args.ip or "TU_IP"
+            port = args.port or "4444"
+            shell_upgrade.run(ip, port)
+        else:
+            if not args.ip or not args.port:
+                print(f"{Colors.FAIL}[-] Error: 'payload' requiere IP y PUERTO (o usa --upgrade para TTY){Colors.ENDC}")
+                sys.exit(1)
+            from modules import payloads
+            payloads.run(args.ip, args.port, use_base64=args.base64, use_urlencode=args.urlencode)
     elif args.command == "crypto":
         from modules import crypto
         crypto.run(args.string)
+    elif args.command == "encoder":
+        from modules import encoder
+        encoder.run(args.string, key=args.key)
     elif args.command == "hashes":
         from modules import hashes
         hashes.run(args.file)
@@ -151,9 +196,21 @@ def main():
             sys.exit(1)
         from modules import ad
         ad.run(args.dc_ip, args.domain, args.parse)
+    elif args.command == "smb":
+        from modules import smb
+        smb.run(args.ip, user=args.user, password=args.password)
+    elif args.command == "sqli":
+        from modules import sqli
+        sqli.run(url=args.url)
+    elif args.command == "privesc":
+        from modules import privesc
+        privesc.run(args.os)
     elif args.command == "cve":
         from modules import cve
         cve.run(args.service)
+    elif args.command == "osint":
+        from modules import osint
+        osint.run(args.domain)
     elif args.command == "report":
         handle_report(args)
     else:

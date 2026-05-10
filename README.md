@@ -1,100 +1,219 @@
-# 🦇 Farei_0x - Obsidian Tier CTF Arsenal
+# 🦇 Farei_0x — Obsidian Tier CTF Arsenal
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Bash](https://img.shields.io/badge/Bash-Script-green)
-![PowerShell](https://img.shields.io/badge/PowerShell-Native-blueviolet)
+![Modules](https://img.shields.io/badge/Modules-14-red)
+![Tier](https://img.shields.io/badge/Tier-Obsidian-black)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
-**Farei_0x** es un framework de automatización ofensiva de alto rendimiento diseñado exclusivamente para competiciones de Capture The Flag (CTF) como TryHackMe, HackTheBox y entornos de laboratorio controlados. 
+**Farei_0x** es un framework de automatización ofensiva de alto rendimiento diseñado exclusivamente para competiciones CTF (TryHackMe, HackTheBox) y entornos de laboratorio controlados.
 
-Su filosofía es simple: **Velocidad de élite y cero fricción.** Elimina el tiempo muerto de la enumeración manual, centraliza el descubrimiento en una base de datos local (SQLite) y aplica lógicas de evasión avanzada (Anti-Rabbit-Hole) para que puedas concentrarte en lo que importa: hackear la lógica de la máquina.
+Su filosofía es simple: **Velocidad de élite y cero fricción.** Elimina el tiempo muerto de la enumeración manual, centraliza los hallazgos en SQLite y aplica lógicas de evasión avanzada para que puedas concentrarte en lo que importa: hackear.
 
 ---
 
-## ⚠️ DESCARGO DE RESPONSABILIDAD LEGAL (DISCLAIMER)
+## ⚠️ DISCLAIMER LEGAL
+
 > **ESTRICTAMENTE PARA USO ÉTICO Y EDUCATIVO.**
-> Este conjunto de herramientas fue creado **única y exclusivamente** para ser utilizado en entornos de laboratorio legales (CTFs), entornos autorizados para auditorías de seguridad (Red Teaming) y plataformas educativas.
-> 
-> El autor **NO se hace responsable** del mal uso, daño o implicaciones legales que puedan derivarse de la utilización de estas herramientas contra infraestructuras sin el consentimiento expreso y por escrito de los propietarios. Si descargas este software, asumes total responsabilidad de tus acciones. **No seas un cibercriminal, usa esto para aprender.**
+> Creado únicamente para CTFs, laboratorios legales y auditorías autorizadas.
+> El autor **NO se hace responsable** del mal uso. Si usás esto, asumís total responsabilidad.
 
 ---
 
-## 🧠 ¿Qué hace a Farei_0x diferente? (Características Core)
+## 🧠 ¿Qué hace a Farei_0x diferente?
 
-A diferencia de tener decenas de scripts de Python y Bash tirados por tu escritorio, `Farei_0x` orquesta todo mediante un único punto de entrada: `Farei_0x.py`.
-
-1. **Memoria de Estado (SQLite):** El módulo de escaneo guarda lo que descubre. El módulo de fuzzing lee esos descubrimientos y ataca de forma autónoma. No tienes que copiar y pegar IPs todo el tiempo.
-2. **Fuzzer "Anti-Rabbit-Hole":** Las máquinas nivel *Insane* suelen devolver código HTTP `200 OK` en rutas que no existen para inundar tus escaneos. `Farei_0x` detecta esto mediante auto-calibración previa, aísla el peso de la página falsa y la ignora durante el ataque real.
-3. **Cero Dependencias Pesadas:** Olvídate de bases de datos pesadas en segundo plano como Neo4j o PostgreSQL. `Farei_0x` parsea JSONs masivos en memoria con Python puro.
-4. **Auto-Reporte:** Al terminar la máquina, extrae todo lo que hiciste y te genera un archivo Markdown impecable para tus Writeups.
-
----
-
-## 🛠️ Uso de Módulos Centrales (`Farei_0x.py`)
-
-Todos estos comandos se ejecutan desde tu máquina atacante (Kali Linux / Parrot OS / WSL).
-
-### 1. RECON (`Farei_0x.py recon <IP>`)
-Lanza un Nmap de 65535 puertos a velocidad máxima (`--min-rate 5000`). Parsea los puertos abiertos y los guarda en la base de datos interna.
-*   **Ejemplo:** `python3 Farei_0x.py recon 10.10.10.5`
-
-### 2. FUZZ (`Farei_0x.py fuzz`)
-Ejecuta un fuzzer web asíncrono ultra-rápido. Si no le pasas una IP, ataca automáticamente a la IP web guardada por el módulo `recon`. Aplica evasión Anti-Rabbit-Hole.
-*   **Ejemplo:** `python3 Farei_0x.py fuzz`
-
-### 3. PAYLOAD (`Farei_0x.py payload <Tu_IP> <Puerto>`)
-Genera un arsenal de **Reverse Shells** listas para copiar y pegar en los lenguajes más utilizados e inusuales (Bash, Python, Perl, Ruby, Awk, Socat, CMD, PowerShell).
-*   **Ejemplo:** `python3 Farei_0x.py payload 10.10.14.5 4444`
-
-### 4. CRYPTO (`Farei_0x.py crypto "<Hash/Cadena>"`)
-Un cuchillo suizo criptográfico. Descifra automáticamente Base64, Base32, Hexadecimal, URL Encode y fuerza bruta de rotaciones (ROT1-25). Si encuentra una flag (ej. `THM{`), te avisa en verde.
-*   **Ejemplo:** `python3 Farei_0x.py crypto "VEhNe2hhY2tlZH0="`
-
-### 5. HASHES (`Farei_0x.py hashes <Archivo>`)
-Le pasas un volcado de base de datos o un `/etc/shadow`. Limpia la basura binaria, extrae los hashes válidos, identifica si es MD5/Bcrypt/SHA512 y te escupe el comando exacto de `hashcat` para romperlo.
-*   **Ejemplo:** `python3 Farei_0x.py hashes dump.sql`
-
-### 6. AUTO-CVE (`Farei_0x.py cve "<Servicio>"`)
-Conecta con la API REST oficial de GitHub. Busca repositorios que contengan exploits de 0-days (PoCs) para la versión exacta de tu servicio y te da el comando `git clone` del repositorio más votado de internet.
-*   **Ejemplo:** `python3 Farei_0x.py cve "Apache 2.4.49"`
-
-### 7. AD-CORE (`Farei_0x.py ad <IP_DC> <Dominio>`)
-Automatización extrema para Active Directory. Te da los comandos exactos de Impacket para *AS-REP Roasting* y *Kerberoasting*. **Nivel Dios:** Permite analizar archivos JSON de BloodHound en offline para encontrar caminos críticos sin usar Neo4j.
-*   **Ejemplo:** `python3 Farei_0x.py ad 10.10.10.10 corp.local --parse users.json`
-
-### 8. REPORT (`Farei_0x.py report`)
-Lee la base de datos de tu sesión actual y te genera el archivo `Bauty_Report.md` con tus IPs, puertos y credenciales para tus apuntes de Obsidian o GitHub.
-*   **Ejemplo:** `python3 Farei_0x.py report`
+1. **Memoria de Estado (SQLite):** Recon guarda, Fuzzer lee y ataca. No copiás IPs todo el tiempo.
+2. **Fuzzer Anti-Rabbit-Hole:** Calibra contra páginas falsas antes de atacar. No te perdés en 200 OK que no existen.
+3. **3 Fases de Recon:** Fast Scan → Deep Service Scan → Sugerencias inteligentes según servicios encontrados.
+4. **Auto-Reporte:** Al terminar la máquina, genera `Bauty_Report.md` con todos los hallazgos.
+5. **14 Módulos Obsidian:** De recon hasta post-explotación, todo en un solo framework.
 
 ---
 
-## 🦠 Herramientas "Standalone" (Para la Víctima)
+## 🛠️ Módulos — Referencia Completa
 
-A diferencia del Core, estos archivos están pensados para subirse y ejecutarse **dentro de la máquina víctima** para escalar privilegios o mantener persistencia.
+### RECONOCIMIENTO
 
-*   **`LSE-Exhaustivo.sh`**: El escáner definitivo para Linux. Detecta binarios SUID raros, tareas Cron, Capabilities y contraseñas ocultas. Ejecutar con `./LSE-Exhaustivo.sh`.
-*   **`WinPrivEsc.ps1`**: Buscador de rutas no entrecomilladas (*Unquoted Service Paths*), credenciales de AutoLogon e historiales de PowerShell en entornos Windows.
-*   **`Exfil-Script.cpp`**: Código en C++ para ser compilado en un binario. Exfiltra las flags `user.txt` y `root.txt` silenciosamente usando Webhooks de Discord.
-*   **`Auto-Pivot.py`**: Utilidad matemática para calcular y escupir comandos de `Chisel` y SSH Port Forwarding perfectos.
-*   **`PCAP-Analyzer.py`**: Analizador de capturas de red `.pcap`. Busca contraseñas de FTP y HTTP viajando en texto plano por la red interceptada.
-*   **`Shell-Stabilizer.py`**: Una guía/script paso a paso para estabilizar tu Netcat reversa en una TTY interactiva y que `CTRL+C` no mate tu conexión.
-
----
-
-## 💻 Requisitos e Instalación
-
-Para que el framework funcione a su máxima capacidad:
-1. Python 3.8+ instalado.
-2. Nmap instalado en el sistema (`sudo apt install nmap`).
-3. (Opcional) Instalar librería asíncrona para Fuzzer: `pip install aiohttp`
-
+#### `recon` — Escaneo Inteligente 3 Fases
 ```bash
-# Clonar el repositorio
-git clone https://github.com/TuUsuario/Farei_0x.git
-cd Farei_0x
-# Ver comandos disponibles
-python3 Farei_0x.py -h
+python3 Farei_0x.py recon 10.10.10.X
+```
+- Fase 1: Nmap `-p- --min-rate 5000` (todos los puertos)
+- Fase 2: `-sCV` solo en puertos abiertos (versiones + scripts)
+- Fase 3: Sugerencias automáticas según servicios + detección de CVEs conocidos
+
+#### `fuzz` — Fuzzing Web + VHost
+```bash
+python3 Farei_0x.py fuzz 10.10.10.X                          # Directorios
+python3 Farei_0x.py fuzz 10.10.10.X --vhost --domain htb.htb  # VHosts/Subdominios
+python3 Farei_0x.py fuzz 10.10.10.X -w /ruta/wordlist.txt     # Wordlist custom
+```
+- Async 50 conexiones simultáneas
+- Anti-Rabbit-Hole automático
+- VHost: detecta cambios de +50 bytes en respuestas HTTP
+
+#### `osint` — OSINT Pasivo Completo
+```bash
+python3 Farei_0x.py osint target.htb
+```
+- WHOIS via RDAP, DNS records (A/MX/NS/TXT/SRV)
+- Fingerprinting de tecnologías web (headers + body)
+- Subdominios via Certificate Transparency (crt.sh) — sin fuerza bruta
+- Google Dorks avanzados (GitHub secrets, Shodan, Pastebin)
+- Email harvesting (theHarvester + Hunter.io)
+
+---
+
+### EXPLOTACIÓN
+
+#### `cve` — Auto-CVE con NVD + GitHub
+```bash
+python3 Farei_0x.py cve "Apache 2.4.49"    # Por servicio
+python3 Farei_0x.py cve "CVE-2021-41773"   # Por CVE-ID directo
+```
+- Consulta API oficial NIST NVD v2.0
+- Score CVSS + Severidad (CRITICAL/HIGH/MEDIUM)
+- Busca PoCs en GitHub específicos para los CVEs encontrados
+- Links de PacketStorm, Exploit-DB, Rapid7
+
+#### `sqli` — Inyección SQL + SSTI
+```bash
+python3 Farei_0x.py sqli --url "http://10.10.10.X/login"
+```
+- Payloads de detección para MySQL, MSSQL, PostgreSQL, Oracle, SQLite, **MongoDB/NoSQL**
+- UNION-based step by step (columnas → dump → file read → webshell)
+- WAF bypass techniques (space2comment, case mix, double encode)
+- sqlmap automatizado con tamper scripts
+- **SSTI payloads** (Jinja2, Twig, Freemarker, Velocity)
+
+#### `payload` — Reverse Shells + TTY Upgrade
+```bash
+python3 Farei_0x.py payload 10.10.14.5 4444          # 10 shells
+python3 Farei_0x.py payload 10.10.14.5 4444 --base64  # Evadir WAF
+python3 Farei_0x.py payload --upgrade                 # TTY upgrade guide
+```
+- 10 tipos de shell (Bash, Python, Perl, Ruby, Awk, Socat, PowerShell, CMD...)
+- Base64 encoding (PowerShell usa UTF-16LE automático)
+- URL encoding para exploits web
+
+---
+
+### POST-EXPLOTACIÓN
+
+#### `privesc` — Escalada de Privilegios
+```bash
+python3 Farei_0x.py privesc --os linux    # 15+ vectores Linux
+python3 Farei_0x.py privesc --os windows  # 12+ vectores Windows
+```
+**Linux:** SUID GTFOBins (15 binarios), sudo abuses (12), grupos peligrosos (docker/lxd/disk/shadow), cron wildcard injection, path hijacking, kernel exploits (DirtyPipe, PwnKit), LinPEAS  
+**Windows:** Potato attacks (PrintSpoofer/GodPotato/JuicyPotato), SeImpersonate, SeBackupPrivilege, AlwaysInstallElevated, Unquoted Service Path, WinPEAS
+
+#### `payload --upgrade` — Shell Stabilization + Pivoting
+```bash
+python3 Farei_0x.py payload --upgrade
+```
+- Python PTY + stty raw, Socat TTY perfecta, rlwrap para Windows
+- Port Forwarding: SSH local/remote, **Chisel**, **Ligolo-ng**
+- Transferencia de archivos: HTTP, SMB, Base64, certutil, wget/curl
+
+#### `smb` — Enumeración SMB Completa
+```bash
+python3 Farei_0x.py smb 10.10.10.X                      # Sesión nula
+python3 Farei_0x.py smb 10.10.10.X -u admin -p Pass123  # Con credenciales
+```
+- Null session: enum4linux-ng, rpcclient, ldapdomaindump, lookupsid
+- Con credenciales: smbmap spider, secretsdump SAM/LSA/NTDS, BloodHound
+- Ataques: AS-REP Roasting, Kerberoasting, ZeroLogon, NTLM Relay
+- Ejecución: psexec, wmiexec, smbexec, evil-winrm, Pass-the-Hash, DCSync
+
+---
+
+### ANÁLISIS CRIPTOGRÁFICO
+
+#### `crypto` — Decodificador Recursivo
+```bash
+python3 Farei_0x.py crypto "VkVoTmUyUnZkV0pzWlgwPQ=="
+```
+- Base64, Base32, Hex, URL Encode (auto + recursivo hasta 5 capas)
+- ROT1-25 con detección automática de flags
+- Detección binaria + extracción a .bin
+
+#### `encoder` — Cifrados Clásicos + XOR Brute Force
+```bash
+python3 Farei_0x.py encoder "... --- --"            # Morse
+python3 Farei_0x.py encoder "ZYLWREVHSZO"            # Atbash auto
+python3 Farei_0x.py encoder "48656c6c6f"             # XOR brute force
+python3 Farei_0x.py encoder "TEXTO" --key CLAVE      # Vigenere
+```
+- Morse, Atbash, Vigenere, Rail Fence (2-5 rails), Bacon Cipher
+- ROT-47, Binary, ASCII Decimal
+- **XOR single-byte brute force** (todos los keys 0x01-0xFF)
+- Auto-detección del tipo de cifrado
+
+---
+
+### OTROS
+
+#### `hashes` — Identificador + Extractor (17 tipos)
+```bash
+python3 Farei_0x.py hashes /etc/shadow
+python3 Farei_0x.py hashes secretsdump.txt
+```
+Detecta: bcrypt, SHA512-Crypt, SHA256-Crypt, MD5-Crypt, PHPass (WordPress), **Kerberos AS-REP (18200)**, **Kerberoast (13100)**, NTLMv1, **NTLMv2 (5600)**, MySQL, SHA-512/256/1, MD5/NTLM  
+Parsea formatos: `/etc/shadow`, secretsdump, Responder NTLMv2
+
+#### `ad` — Active Directory
+```bash
+python3 Farei_0x.py ad 10.10.10.X corp.local
+python3 Farei_0x.py ad --parse users.json
+```
+- Comandos Impacket: AS-REP, Kerberoast, BloodHound, secretsdump, PSExec
+- Parser BloodHound offline (sin Neo4j): detecta usuarios vulnerables
+
+#### `crypto` + `report`
+```bash
+python3 Farei_0x.py report   # Genera Bauty_Report.md con todos los hallazgos
 ```
 
 ---
-*Hecho con agresividad competitiva para romper las ligas de CTFs.* 🦇
+
+## 📋 Cheatsheet Rápido
+
+```bash
+python3 Farei_0x.py recon 10.10.10.X
+python3 Farei_0x.py fuzz 10.10.10.X
+python3 Farei_0x.py fuzz 10.10.10.X --vhost --domain target.htb
+python3 Farei_0x.py osint target.htb
+python3 Farei_0x.py cve "Apache 2.4.49"
+python3 Farei_0x.py sqli --url "http://10.10.10.X/login"
+python3 Farei_0x.py smb 10.10.10.X
+python3 Farei_0x.py payload 10.10.14.5 4444 --base64
+python3 Farei_0x.py payload --upgrade
+python3 Farei_0x.py privesc --os linux
+python3 Farei_0x.py privesc --os windows
+python3 Farei_0x.py crypto "VEhNe2ZsYWd9"
+python3 Farei_0x.py encoder "... --- ..."
+python3 Farei_0x.py hashes /etc/shadow
+python3 Farei_0x.py ad 10.10.10.X corp.local
+python3 Farei_0x.py report
+```
+
+---
+
+## 💻 Instalación
+
+```bash
+git clone https://github.com/sudo-bautista-johansson/Ethical-Hacking-Tooling.git
+cd "Ethical Hacking tooling"
+pip install -r requirements.txt
+python3 Farei_0x.py --help
+```
+
+**Dependencias:**
+- Python 3.8+
+- `pip install aiohttp` (Fuzzer async)
+- Nmap en el PATH (`sudo apt install nmap`)
+- Herramientas opcionales: impacket, crackmapexec, evil-winrm, enum4linux-ng, bloodhound-python
+
+---
+
+*Hecho con agresividad competitiva para speedrunear Insane VMs.* 🦇💀

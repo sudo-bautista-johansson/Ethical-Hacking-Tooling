@@ -1,0 +1,66 @@
+# 🧪 Batería de Tests — 6 Módulos Nuevos
+# Copiar y pegar en tu terminal de PowerShell uno por uno
+
+# ═══════════════════════════════════════════════════════
+# TEST 1: PRIVESC — Linux (sin red, instantáneo)
+# ═══════════════════════════════════════════════════════
+python Farei_0x.py privesc --os linux
+
+# ═══════════════════════════════════════════════════════
+# TEST 2: PRIVESC — Windows
+# ═══════════════════════════════════════════════════════
+python Farei_0x.py privesc --os windows
+
+# ═══════════════════════════════════════════════════════
+# TEST 3: SHELL UPGRADE (sin red, instantáneo)
+# ═══════════════════════════════════════════════════════
+python Farei_0x.py payload --upgrade
+
+# ═══════════════════════════════════════════════════════
+# TEST 4: SQLI (sin red, instantáneo)
+# ═══════════════════════════════════════════════════════
+python Farei_0x.py sqli --url "http://10.10.10.5/login.php"
+
+# ═══════════════════════════════════════════════════════
+# TEST 5: ENCODER — Varios tipos de cifrado
+# ═══════════════════════════════════════════════════════
+
+# 5a. Morse code
+python Farei_0x.py encoder ".... .- -.-. -.- . -.."
+
+# 5b. Atbash (ZYLWREVHSZO = "ATBASHTEST" invertido)
+python Farei_0x.py encoder "ZYLWREVHSZO"
+
+# 5c. XOR brute force (cadena hex XOR-eada)
+python Farei_0x.py encoder "1b1e0857001f061a570b070b0b570a061c5713"
+
+# 5d. Binary
+python Farei_0x.py encoder "01001000 01010100 01000010 01111011 01100110 01101100 01100001 01100111 01111101"
+
+# 5e. Vigenere con key
+python Farei_0x.py encoder "RIJVS" --key "KEY"
+
+# ═══════════════════════════════════════════════════════
+# TEST 6: SMB (sin red — solo genera comandos)
+# ═══════════════════════════════════════════════════════
+
+# 6a. Sin credenciales
+python Farei_0x.py smb 10.10.10.X
+
+# 6b. Con credenciales
+python Farei_0x.py smb 10.10.10.X -u admin -p Password123
+
+# ═══════════════════════════════════════════════════════
+# TEST 7: OSINT (requiere internet — ~15 segundos)
+# ═══════════════════════════════════════════════════════
+python Farei_0x.py osint tryhackme.com
+
+# ═══════════════════════════════════════════════════════
+# TEST 8: ENCODER — Flag Detection
+# ═══════════════════════════════════════════════════════
+
+# 8a. Bacon cipher que contiene "HTB"
+python Farei_0x.py encoder "AABBB BAABB AAAAB"
+
+# 8b. ROT-47 que contiene flag
+python Farei_0x.py encoder "w6u_E=4C6]"
