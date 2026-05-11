@@ -63,7 +63,7 @@ def get_db_context():
 def chat_gemini(api_key, history):
     # Usamos gemini-1.5-flash o gemini-pro. Por seguridad de versión de API, usamos gemini-1.5-flash que es rápido y soporta systemInstruction.
     # Pero para máxima compatibilidad con v1beta, usamos la vieja confiable inyección en el primer turno.
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
     
     # history es una lista de [{"role": "user"|"model", "parts": [{"text": "..."}]}]
     data = {
